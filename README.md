@@ -1,14 +1,25 @@
-# jdk-8u231-oracle-to-ubuntu
-Java jdk-8u231 para Ubuntu 19.10
-# FONTE: https://www.javahelps.com/2015/03/install-oracle-jdk-in-ubuntu.html
+# AutomaGizar com ShellScrip (Shell-Base)
 
-## Download: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+# Install Oracle JDK 8 on Linux
+## Instalar Oracle JDK 8 no Linux/Ubuntu 19.10
 
-# Comandos no terminal:
+__FONTE:__ [Install Oracle JDK 8 on Linux](https://www.javahelps.com/2015/03/install-oracle-jdk-in-ubuntu.html)
+
+__Download:__ [Java SE Development Kit 8 Downloads](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+
+### Comandos no terminal
+
+__Criar o diretório__ 
+```
 sudo mkdir /usr/lib/jvm
-cd /usr/lib/jvm
-sudo tar -xvzf ~/Downloads/jdk-8u231-linux-x64.tar.gz
+```
 
+__Extrair para o diretório criado__
+```
+$ sudo tar -xvzf ~/Downloads/jdk-8u231-linux-x64.tar.gz -C /usr/lib/jvm
+```
+
+__Editar o PATH de environment
 sudo nano /etc/environment
     ## CONTEÚDO DE '/etc/environment' após a edição
     PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/jvm/jdk1.8.0_231/bin:/usr/lib/jvm/jdk1.8.0_231/db/bin:/usr/lib/jvm/jdk1.8.0_231/jre/bin"
