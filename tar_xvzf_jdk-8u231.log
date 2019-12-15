@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
-Script: install-jdk8 v1.0.0 (Vovolinux 2019)
+Script: install-jdk8 v"1.0.1"" (Vovolinux 2019)
 https://github.com/Viniciusalopes/jdk-8u231-oracle-to-ubuntu
 -------------------------------------------------------------------------------
-2019-12-15_00:43:47 Iniciando extração do arquivo jdk-8u231-linux-x64.tar.gz
+2019-12-15_02:21:23 - Iniciando extração do arquivo jdk-8u231-linux-x64.tar.gz
 jdk1.8.0_231/
 jdk1.8.0_231/lib/
 jdk1.8.0_231/lib/visualvm/
@@ -1796,4 +1796,4 @@ jdk1.8.0_231/man/man1/jstatd.1
 jdk1.8.0_231/man/man1/javadoc.1
 jdk1.8.0_231/THIRDPARTYLICENSEREADME.txt
 jdk1.8.0_231/COPYRIGHT
-2019-12-15_00:43:50 Fim.
+2019-12-15_02:21:23 Fim.
