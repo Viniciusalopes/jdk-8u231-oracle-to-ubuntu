@@ -107,7 +107,7 @@ verifica_distro()
         } 
 }
 
-# Verifica se o arquivo está na mesma pasta do script
+# Verifica se o arquivo está no mesmo diretório do script
 verifica_arquivo()
 {
     ! [[ -e "./${arquivo}" ]] && {
