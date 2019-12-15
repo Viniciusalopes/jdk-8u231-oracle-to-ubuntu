@@ -31,11 +31,10 @@ Thu Nov 15 01:01:22 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
 
 # Instruções
 
-- Fazer o download do arquivo __jdk-8u231-linux-x64.tar.gz__ no site oficial
-__Link:__ [Java SE Development Kit 8 Downloads](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+- Fazer o download do arquivo __jdk-8u231-linux-x64.tar.gz__ no site oficial -> [Java SE Development Kit 8 Downloads](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 
-- Salvar o script __install-jdk8__ no mesmo diretório de download do arquivo __jdk-8u231-linux-x64.tar.gz__ 
+- Salvar o script [install-jdk8](install-jdk8) no mesmo diretório de download do arquivo __jdk-8u231-linux-x64.tar.gz__ 
 
 - __Conceder permissão de execução para o script__
 ```
