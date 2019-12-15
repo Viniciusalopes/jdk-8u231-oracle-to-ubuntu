@@ -38,12 +38,12 @@ Thu Nov 15 01:01:22 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
 
 - __Conceder permissão de execução para o script__
 ```
-chmod + x install-jdk8
+chmod +x install-jdk8
 ```
 
 - __Executar o script__
 ```
-./install-jdk8
+sudo ./install-jdk8
 ```
 
 ---
