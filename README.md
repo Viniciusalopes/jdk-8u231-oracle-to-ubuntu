@@ -26,7 +26,7 @@ VERSION_CODENAME=eoan
 UBUNTU_CODENAME=eoan
 
 Linux VINICIUS-NB 5.3.0-24-lowlatency #26-Ubuntu SMP PREEMPT
-Thu Nov 15 01:01:22 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+Thu Nov 14 02:16:52 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
 ```
 
 # Instruções
