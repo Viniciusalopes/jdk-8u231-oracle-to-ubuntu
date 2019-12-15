@@ -7,7 +7,7 @@ AUTOR             : Vovolinux <suporte@vovolinux.com.br>
 HOMEPAGE          : https://vovolinux.com.br 
 DATA-DE-CRIAÇÃO   : 15/12/2019 às 00:07 
 PROGRAMA          : install-jdk8
-VERSÃO            : 1.0.0
+VERSÃO            : 1.0.1
 LICENÇA           : MIT
 PEQUENA-DESCRIÇÃO : Instalação do Java SE Development Kit 8 para Ubuntu 19.10
 
