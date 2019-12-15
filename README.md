@@ -43,7 +43,7 @@ chmod +x install-jdk8
 
 - __Executar o script__
 ```
-./install-jdk8
+sudo ./install-jdk8
 ```
 
 ---
