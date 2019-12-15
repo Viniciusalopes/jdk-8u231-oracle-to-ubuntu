@@ -1,0 +1,213 @@
+#!/usr/bin/env bash
+# Template orgulhosamente criado por (Shell-Base)
+
+#-----------HEADER-------------------------------------------------------------|
+# AUTOR             : Vovolinux <suporte@vovolinux.com.br>
+# HOMEPAGE          : https://vovolinux.com.br 
+# DATA-DE-CRIAÇÃO   : 15/12/2019 às 21:07 
+# PROGRAMA          : install-jdk8
+# VERSÃO            : 1.0.0
+# LICENÇA           : MIT
+# PEQUENA-DESCRIÇÃO : Instalação do Java SE Development Kit 8 para Ubuntu
+# 
+# TESTADO COM:
+# NAME="Ubuntu"
+# VERSION="19.10 (Eoan Ermine)"
+# ID=ubuntu
+# ID_LIKE=debian
+# PRETTY_NAME="Ubuntu 19.10"
+# VERSION_ID="19.10"
+# HOME_URL="https://www.ubuntu.com/"
+# SUPPORT_URL="https://help.ubuntu.com/"
+# BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+# PRIVACY_POLICY_URL=
+#   "https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+# VERSION_CODENAME=eoan
+# UBUNTU_CODENAME=eoan
+# 
+# Linux VINICIUS-NB 5.3.0-24-lowlatency #26-Ubuntu SMP PREEMPT 
+# Thu Nov 14 02:16:52 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+# 
+# CHANGELOG :
+#
+#------------------------------------------------------------------------------|
+
+#--------------------------------- VARIÁVEIS ---------------------------------->
+versao='1.0.0'
+
+separa='-------------------------------------------------------------------------------'
+
+# Data atual
+data=$(date "+%Y%m%d_%H%M%S")
+log='/var/log/tar_xvzf_jdk-8u231.log'
+dir='/usr/lib/jvm'
+
+# Arquivo de instalação
+arquivo='jdk-8u231-linux-x64.tar.gz'
+download='https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html'
+
+# Identifica a Distro
+release='os-release'
+linha='PRETTY'
+distro=''
+
+# Distros testadas
+distros=(
+    'Ubuntu 19.10'
+    )
+
+# Flag para continuar o script
+continua=0
+
+#------------------------------- FIM-VARIÁVEIS --------------------------------<
+
+
+
+#----------------------------------- FUNÇÕES ---------------------------------->
+
+topo()
+{
+    printf %b "$separa\nScript: install-jdk8 v$versao (Vovolinux 2019)\n"
+    printf %b "https://github.com/Viniciusalopes/jdk-8u231-oracle-to-ubuntu\n$separa\n"
+}
+
+# Verifica se o script está sendo executado como r00t.
+is_root()
+{
+    # é root?
+    [[ "$UID" -ne "0" ]] && {  
+        printf '%b' "Execute como r00t.\n"
+        exit 1
+    }
+}
+
+# Obtém o nome da distro
+get_distro()
+{
+    if ! [[ -e /etc/os-release ]]; then
+        release='lsb-release'
+        linha='CODENAME'
+    fi    
+
+    distro=$(cat /etc/"${release}" | grep "${linha}" | cut -d"\"" -f2)
+}
+
+# Verifica se o script já foi testado na distro atual
+verifica_distro()
+{
+    for d in "${distros[@]}"; do                     
+        if [[ "${d}" == ${distro} ]]; then
+            continua=1
+        fi
+    done
+
+    [[ $continua -eq 0 ]] && { 
+        echo -e ">> Este script ainda não foi testado com ${distro}.\n";
+        exit $continua; 
+        } 
+}
+
+# Verifica se o arquivo está na mesma pasta do script
+verifica_arquivo()
+{
+    ! [[ -e "./${arquivo}" ]] && {
+        echo -e ">> O arquivo '${arquivo}' precisa estar no mesmo diretório do script.";
+        echo -e ">> Faça o download em: ${download}.";
+        exit 1; 
+    }
+}
+
+# Extrai o arquivo
+extrai_arquivo()
+{
+    # Cria o diretório
+    if [[ -e "./${arquivo}" ]]; then
+        printf %b ">> Criando diretório jvm...\n"
+        if ! [[ -e ${dir} ]]; then
+            mkdir -v ${dir}
+        fi
+
+        # Extrai para o diretório criado
+        printf %b "${separa}\n>> Extraindo '$arquivo...'\nLOG da extração: $log\n"
+        topo >> $log
+        printf %b "$(date "+%Y-%m-%d_%H:%M:%S") Iniciando extração do arquivo $arquivo\n"  >> $log
+        tar -xvzf jdk-8u231-linux-x64.tar.gz -C ${dir} >> $log
+       printf %b "$(date "+%Y-%m-%d_%H:%M:%S") Fim.\n" >> $log
+    fi
+}
+
+# Atualiza /etc/environment
+atualiza_env()
+{
+    # Backup de environment
+    printf %b "${separa}\n"
+    cp -v /etc/environment /etc/environment_${data}_bkp
+
+    # Edita o PATH de environment
+    cat << EOF > /etc/environment
+# UPDATE BY Vovolinux <https://github.com/Viniciusalopes/jdk-8u231-oracle-to-ubuntu>
+# DATA: ${data}
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:${dir}/jdk1.8.0_231/bin:${dir}/jdk1.8.0_231/db/bin:${dir}/jdk1.8.0_231/jre/bin"
+J2SDKDIR="${dir}/jdk1.8.0_231"
+J2REDIR="${dir}/jdk1.8.0_231/jre"
+JAVA_HOME="${dir}/jdk1.8.0_231"
+DERBY_HOME="${dir}/jdk1.8.0_231/db"
+EOF
+}
+
+# Update e set
+update()
+{
+    # Comandos no terminal:
+    printf %b "${separa}\n"
+    update-alternatives --install "/usr/bin/java" "java" "${dir}/jdk1.8.0_231/bin/java" 0
+    update-alternatives --set java ${dir}/jdk1.8.0_231/bin/java
+    update-alternatives --list java
+    update-alternatives --install "/usr/bin/javac" "javac" "${dir}/jdk1.8.0_231/bin/javac" 0
+    update-alternatives --set javac ${dir}/jdk1.8.0_231/bin/javac
+    update-alternatives --list javac
+}
+
+mensagem_final()
+{
+    cat << EOF
+$separa
+A instalação terminou.
+Caso o seu Netbeans já esteja instalado, atualize  valor de 'netbeans_jdkhome'
+no arquivo '~/netbeans-v.v/etc/netbeans.conf'.
+
+Exemplo:
+netbeans_jdkhome="${dir}/jdk1.8.0_231"
+$separa
+Vovolinux: Sem trauma e sem teoria!
+
+EOF
+}
+
+#--------------------------------- FIM-FUNÇÕES --------------------------------<
+
+
+
+#---------------------------------- TESTES ------------------------------------>
+topo
+is_root
+get_distro
+verifica_distro
+verifica_arquivo
+
+#--------------------------------- FIM-TESTES ---------------------------------<
+
+# Programa começa aqui :)
+
+extrai_arquivo
+atualiza_env
+update
+
+# Exibe a versão instalada
+# A saída do comando 'java -version' deve ser:
+# java version "1.8.0_231"
+# Java(TM) SE Runtime Environment (build 1.8.0_231-b11)
+# Java HotSpot(TM) 64-Bit Server VM (build 25.231-b11, mixed mode)
+java -version
+
+mensagem_final
