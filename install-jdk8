@@ -47,16 +47,16 @@ data_bkp=$(date "+%Y%m%d_%H%M%S")
 data_log=$(date "+%Y-%m-%d_%H:%M:%S")
 
 # Arquivo de log
-log='/var/log/tar_xvzf_jdk-8u231.log'
+log='/var/log/tar_xvzf_jdk-8u241.log'
 
 # Diretório de instalação
 dir='/usr/lib/jvm'
 
 # Arquivo de instalação
-arquivo='jdk-8u231-linux-x64.tar.gz'
+arquivo='jdk-8u241-linux-x64.tar.gz'
 
 # Versão do jdk
-vjdk='jdk1.8.0_231'
+vjdk='jdk1.8.0_241'
 
 # Link para download do jdk
 download='https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html'
@@ -86,7 +86,7 @@ topo()
     cat << EOF
 ${separa}
 Script: install-jdk8 v"${versao}"" (Vovolinux 2019)
-https://github.com/Viniciusalopes/jdk-8u231-oracle-to-ubuntu
+https://github.com/Viniciusalopes/jdk-8u241-oracle-to-ubuntu
 ${separa}
 EOF
 }
@@ -168,7 +168,7 @@ atualiza_env()
 
     # Edita o PATH de environment
     cat << EOF > /etc/environment
-# UPDATE BY Vovolinux <https://github.com/Viniciusalopes/jdk-8u231-oracle-to-ubuntu>
+# UPDATE BY Vovolinux <https://github.com/Viniciusalopes/jdk-8u241-oracle-to-ubuntu>
 # DATA: ${data_log}
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:${dir}/${vjdk}/bin:${dir}/${vjdk}/db/bin:${dir}/${vjdk}/jre/bin"
 J2SDKDIR="${dir}/${vjdk}"
@@ -228,9 +228,9 @@ update
 
 # Exibe a versão instalada
 # A saída do comando 'java -version' deve ser:
-# java version "1.8.0_231"
-# Java(TM) SE Runtime Environment (build 1.8.0_231-b11)
-# Java HotSpot(TM) 64-Bit Server VM (build 25.231-b11, mixed mode)
+# java version "1.8.0_241"
+# Java(TM) SE Runtime Environment (build 1.8.0_241-b11)
+# Java HotSpot(TM) 64-Bit Server VM (build 25.241-b11, mixed mode)
 java -version
 
 mensagem_final
