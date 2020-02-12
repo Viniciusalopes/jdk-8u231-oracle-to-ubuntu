@@ -69,6 +69,7 @@ distro=''
 # Distros testadas
 distros=(
     'Ubuntu 19.10'
+    'Linux Mint 19.3'
     )
 
 # Flag para continuar o script
