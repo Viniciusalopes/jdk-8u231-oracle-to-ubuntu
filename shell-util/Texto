@@ -15,26 +15,26 @@
 #------------------------------------------------------------------------------|
 
 #--------------------------------- VARIÁVEIS ---------------------------------->
-# Separador padrão
-caractere='-'
 
-# Largura padrão
-colunas=80
 #------------------------------- FIM-VARIÁVEIS --------------------------------<
-
-
 
 #----------------------------------- FUNÇÕES ---------------------------------->
 
-# Imprime uma linha na tela
+# Repete um caractere N vezes
+# $1 = caractere a ser repetido
+# $2 = quantidade de repetições
+repete()
+{
+    for i in $(seq 1 $2); do
+        printf %b "$1"
+    done
+}
+
+# Imprime uma linha de separação na tela
 # $1 = caractere do separador
 # $2 = quantidade de colunas
 separa()
-{   printf %b "Colunas: $colunas\n"
-
-    for i in $(seq 1 ${colunas}); do
-        printf %b "${caractere}"
-    done
+{   repete "$1" $2
     printf %b "\n"
 }
 
@@ -44,10 +44,7 @@ separa()
 
 
 #---------------------------------- TESTES ------------------------------------>
-#
-# Testes iniciais do seu programa vão neste bloco.
 
-is_root
 
 #--------------------------------- FIM-TESTES ---------------------------------<
 
