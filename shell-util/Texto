@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Template orgulhosamente criado por (Shell-Base)
+
+#-----------HEADER-------------------------------------------------------------|
+# AUTOR             : Vovolinux <suporte@vovolinux.com.br>
+# HOMEPAGE          : https://vovolinux.com.br 
+# DATA DE CRIAÇÃO   : 26/04/2020 às 09:58 
+# PROGRAMA          : Texto
+# VERSÃO            : 1.0.0
+# LICENÇA           : MIT - © 2020 - Vovolinux
+# PEQUENA DESCRIÇÃO : Operações com textos e strings
+#
+# CHANGELOG :
+#
+#------------------------------------------------------------------------------|
+
+#--------------------------------- VARIÁVEIS ---------------------------------->
+# Separador padrão
+caractere='-'
+
+# Largura padrão
+colunas=80
+#------------------------------- FIM-VARIÁVEIS --------------------------------<
+
+
+
+#----------------------------------- FUNÇÕES ---------------------------------->
+
+# Imprime uma linha na tela
+# $1 = caractere do separador
+# $2 = quantidade de colunas
+separa()
+{   printf %b "Colunas: $colunas\n"
+
+    for i in $(seq 1 ${colunas}); do
+        printf %b "${caractere}"
+    done
+    printf %b "\n"
+}
+
+
+#--------------------------------- FIM-FUNÇÕES --------------------------------<
+
+
+
+#---------------------------------- TESTES ------------------------------------>
+#
+# Testes iniciais do seu programa vão neste bloco.
+
+is_root
+
+#--------------------------------- FIM-TESTES ---------------------------------<
+
+# Programa começa aqui :)
+
