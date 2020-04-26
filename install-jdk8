@@ -52,7 +52,7 @@ sources=('Texto' 'So')
 
 # Nome da distribuição
 distro=''
-repo_shell_util='https://github.com/Viniciusalopes/jdk8-oracle-for-linux'
+raw_shell_util='https://raw.githubusercontent.com/Viniciusalopes/jdk8-oracle-for-linux/master/shell-util/'
 dir_shell_util='shell-util'
 
 # Diretório de instalação
@@ -92,7 +92,7 @@ get_sources()
     for s in "${sources[@]}"; do
         if ! [[ -f "$dir_shell_util/$s" ]]; then
             printf %b "$dir_shell_util/$s\n"
-            wget -v ${repo_shell_util}${s} -O "$dir_shell_util/$s"
+            wget -v ${raw_shell_util}${s} -O "$dir_shell_util/$s"
         fi
         source $dir_shell_util/$s
     done
@@ -106,10 +106,10 @@ get_sources()
 cabecalho()
 {
     cat << EOF
-$(separa)
+$(separa $separador $colunas)
 Script: install-jdk8 v${versao} (${copyright})
 ${repositorio}
-$(separa)
+$(separa $separador $colunas)
 EOF
 }
 
