@@ -16,7 +16,7 @@
 #   - Detecção automáGica da versão do JDK a ser instalado.
 #   - Incluída a opção de continuar mesmo que este script ainda não tenha
 #     sido testado com a distribuição atual.
-#   - Modularização de funções com o projeto 'shell-util'
+#   - Modularização de funções com scripts do projeto 'shell-util'
 #     <https://github.com/Viniciusalopes/shell-util>
 #
 # 2019-12-15 - v1.0.1 - Vovolinux:
@@ -28,62 +28,85 @@
 
 #--------------------------------- VARIÁVEIS ---------------------------------->
 
+### VARIÁVEIS DO SCRIPT ###
+
 # Versão deste script
 versao='1.0.2'
 
-# Repositório deste script
-repositorio='https://github.com/Viniciusalopes/jdk8-oracle-for-linux'
-
 # Informação de Copyryght
 copyright='© 2020 - Vovolinux'
-
-# Separador de texto
-separador='-'
-
-# Quantidade de colunas do texto exibido
-colunas=80
 
 # Data atual
 data_bkp=$(date "+%Y%m%d_%H%M%S")
 data_log=$(date "+%Y-%m-%d_%H:%M:%S")
 
-# Arquivos auxiliares
+# Scripts auxiliares
 sources=('Texto' 'So')
 
-# Nome da distribuição
-distro=''
+### VARIÁVEIS DO SISTEMA OPERACIONAL ###
+
+# Hardware da máquina (arquitetura)
+if [[ $(uname -m) = "x86_64" ]]; then
+    arquitetura="x64"
+else
+    arquitetura="i586"
+fi
+
+
+### VARIÁVEIS PARA LINKS WEB ###
+
+# Repositório deste script
+repositorio='https://github.com/Viniciusalopes/jdk8-oracle-for-linux'
+
+# Caminho para download dos scripts auxiliares de shell-util
 raw_shell_util='https://raw.githubusercontent.com/Viniciusalopes/jdk8-oracle-for-linux/master/shell-util/'
-dir_shell_util='shell-util'
-
-# Diretório de instalação
-dir_lib_jvm='/usr/lib/jvm'
-
-# Arquivo de log
-log=''
-
-# Arquivo de instalação
-arquivo_tar_gz='jdk-8u*-linux-*.tar.gz'
-
-# Versão do jdk
-vjdk=''
 
 # Link para download do jdk
 download='https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html'
 
-set_distros()
-{
-    # Distros testadas
-    distros=(
-        'Ubuntu 20.04 LTS'
-        'Ubuntu 19.10'
-        'Linux Mint 19.3'
-        'Linux Mint 19.2'
-        )
-}
+
+### VARIÁVEIS DE DIRETÓRIOS E ARQUIVOS ###
+
+# Diretório para scripts auxiliares e dependências
+dir_shell_util='/tmp/shell-util'
+
+# Diretório de instalação
+dir_lib_jvm='/usr/lib/jvm'
+
+# Arquivo de instalação do jdk
+arquivo_tar_gz="jdk-8u*-linux-${arquitetura}.tar.gz"
+
+# Versão do jdk
+vjdk=''
+
+# Arquivo de log
+log=''
+
+
+# Distros testadas
+distros=(
+    'Ubuntu 20.04 LTS'
+    'Ubuntu 19.10'
+    'Linux Mint 19.3'
+    'Linux Mint 19.2'
+)
+
 #------------------------------- FIM-VARIÁVEIS --------------------------------<
 
 
-#---------------------------------- SOURCES ----------------------------------->
+#-------------------------------- DEPENDÊNCIAS -------------------------------->
+# Cria o diretório temporário para scripts auxiliares se não existir
+printf %b "Verificando dependências...\n"
+
+if ! [[ -d ${dir_shell_util} ]]; then
+    mkdir -v "${dir_shell_util}"
+fi
+
+# Download 
+if ! [[ -f "${dir_shell_util}"]]; then
+    
+fi
+
 get_sources()
 {
     # Cria o diretório temporário para scripts auxiliares se não existir
@@ -94,7 +117,7 @@ get_sources()
             printf %b "$dir_shell_util/$s\n"
             wget -v ${raw_shell_util}${s} -O "$dir_shell_util/$s"
         fi
-        source $dir_shell_util/$s
+        source "$dir_shell_util/$s"
     done
 }
 #------------------------------------------------------------------------------|
