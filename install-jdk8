@@ -68,7 +68,7 @@ fi
 repositorio='https://github.com/Viniciusalopes/jdk8-oracle-for-linux'
 
 # Caminho para download dos scripts auxiliares de shell-util
-raw_shell_util='https://raw.githubusercontent.com/Viniciusalopes/shell-util/master'
+raw_shell_util='https://raw.githubusercontent.com/Viniciusalopes/jdk8-oracle-for-linux/master/shell-util/'
 
 # Link para download do jdk
 download='https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html'
