@@ -4,11 +4,11 @@
 #-----------HEADER-------------------------------------------------------------|
 # AUTOR             : Vovolinux <suporte@vovolinux.com.br>
 # HOMEPAGE          : https://vovolinux.com.br 
-# DATA-DE-CRIAÇÃO   : 15/12/2019 às 21:07 
+# DATA DE CRIAÇÃO   : 15/12/2019 às 21:07 
 # PROGRAMA          : install-jdk8
 # VERSÃO            : 1.0.2
 # LICENÇA           : MIT - © 2020 - Vovolinux
-# PEQUENA-DESCRIÇÃO : Instalação do Java SE Development Kit 8 para Ubuntu
+# PEQUENA DESCRIÇÃO : Instalação do Java SE Development Kit 8 para Ubuntu
 # 
 # CHANGELOG :
 # 2020-04-26 - v1.0.2 - Vovolinux:
@@ -18,6 +18,7 @@
 #     sido testado com a distribuição atual.
 #   - Modularização de funções com scripts do projeto 'shell-util'
 #     <https://github.com/Viniciusalopes/shell-util>
+#   - Incluída a sessão --- DEPENDÊNCIAS ---
 #
 # 2019-12-15 - v1.0.1 - Vovolinux:
 #   - Melhoria de comentários e aproveitamento de variáveis.
@@ -30,22 +31,30 @@
 
 ### VARIÁVEIS DO SCRIPT ###
 
-# Versão deste script
+# Autor
+autor='Vovolinux'
+
+# Programa
+programa='install-jdk8'
+
+# Versão
 versao='1.0.2'
 
+# Ano atual
+ano=$(date "+%Y")
+
 # Informação de Copyryght
-copyright='© 2020 - Vovolinux'
+copyright="© ${ano} - ${autor}"
 
-# Data atual
-data_bkp=$(date "+%Y%m%d_%H%M%S")
-data_log=$(date "+%Y-%m-%d_%H:%M:%S")
+# Separador de linha
+separador='-'
 
-# Scripts auxiliares
-sources=('Texto' 'So')
+# Quantidade de colunas para exibição no CLI
+colunas=80
 
 ### VARIÁVEIS DO SISTEMA OPERACIONAL ###
 
-# Hardware da máquina (arquitetura)
+# Hardware da máquina (arquitetura) para compor o nome do arquivo_tar_gz
 if [[ $(uname -m) = "x86_64" ]]; then
     arquitetura="x64"
 else
@@ -59,7 +68,7 @@ fi
 repositorio='https://github.com/Viniciusalopes/jdk8-oracle-for-linux'
 
 # Caminho para download dos scripts auxiliares de shell-util
-raw_shell_util='https://raw.githubusercontent.com/Viniciusalopes/jdk8-oracle-for-linux/master/shell-util/'
+raw_shell_util='https://raw.githubusercontent.com/Viniciusalopes/shell-util/master'
 
 # Link para download do jdk
 download='https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html'
@@ -76,81 +85,80 @@ dir_lib_jvm='/usr/lib/jvm'
 # Arquivo de instalação do jdk
 arquivo_tar_gz="jdk-8u*-linux-${arquitetura}.tar.gz"
 
+# Arquivo de log
+log="/var/log/install-jdk_${versao}_${autor}.log"
+
 # Versão do jdk
 vjdk=''
 
-# Arquivo de log
-log=''
+# Dependências e scripts auxiliares
+sources=('so')
 
+# Data atual para nome de arquivo
+data_arquivo=''
 
-# Distros testadas
-distros=(
-    'Ubuntu 20.04 LTS'
-    'Ubuntu 19.10'
-    'Linux Mint 19.3'
-    'Linux Mint 19.2'
-)
+# Data atual para escrever no log
+data_log=''
 
 #------------------------------- FIM-VARIÁVEIS --------------------------------<
 
 
 #-------------------------------- DEPENDÊNCIAS -------------------------------->
-# Cria o diretório temporário para scripts auxiliares se não existir
+
 printf %b "Verificando dependências...\n"
 
+# Cria o diretório temporário para scripts auxiliares se não existir
 if ! [[ -d ${dir_shell_util} ]]; then
     mkdir -v "${dir_shell_util}"
 fi
 
+dep="${dir_shell_util}/${sources[0]}"
+
+printf %b "> ${dep} -> "
+
 # Download 
-if ! [[ -f "${dir_shell_util}"]]; then
-    
+if [[ -f ${dep} ]]; then
+    printf %b "OK\n"
+else
+    printf %b "Não encontrada.\n"
+    wget -v ${raw_shell_util}/${sources[0]} -O "${dep}"
+
+    # Encerra se não conseguir fazer o download do arquivo
+    if [[ $? -ne 0 ]]; then
+        rm -rf "${dep}"
+        exit 1
+    fi
 fi
 
-get_sources()
-{
-    # Cria o diretório temporário para scripts auxiliares se não existir
-    ! [[ -d $dir_shell_util ]] && mkdir -v $dir_shell_util
+# Inclui a dependencia principal
+source "${dep}"
 
-    for s in "${sources[@]}"; do
-        if ! [[ -f "$dir_shell_util/$s" ]]; then
-            printf %b "$dir_shell_util/$s\n"
-            wget -v ${raw_shell_util}${s} -O "$dir_shell_util/$s"
-        fi
-        source "$dir_shell_util/$s"
-    done
-}
+# Dependencias de Operações com texto, Menus e específicas para o jdk8
+sources=('texto' 'menu')
+
+# Inclui demais dependencias de sources()
+get_sources "${dir_shell_util}" "${raw_shell_util}" ""
+
 #------------------------------------------------------------------------------|
 
 
 #----------------------------------- FUNÇÕES ---------------------------------->
 
-# Mensagem de cabecalho
-cabecalho()
-{
-    cat << EOF
-$(separa $separador $colunas)
-Script: install-jdk8 v${versao} (${copyright})
-${repositorio}
-$(separa $separador $colunas)
-EOF
-}
-
-# Extrai o arquivo
+# Extrai o arquivo_tar_gz
 extrai_arquivo()
 {
     # Cria o diretório
-    if [[ -e "./${arquivo}" ]]; then
+    if [[ -e "./${arquivo_tar_gz}" ]]; then
         printf %b ">> Criando diretório jvm...\n"
-        if ! [[ -e ${dir_lib_jvm} ]]; then
-            mkdir -v ${dir_lib_jvm}
+        if ! [[ -e "${dir_lib_jvm}" ]]; then
+            mkdir -v "${dir_lib_jvm}"
         fi
 
         # Extrai para o diretório criado
-        printf %b "${separa}\n>> Extraindo '$arquivo...'\nLOG da extração: $log\n"
-        cabecalho >> $log
-        printf %b "$data_log - Iniciando extração do arquivo $arquivo\n"  >> $log
-        tar -xvzf ${arquivo} -C ${dir_lib_jvm} >> $log
+        printf %b "$(separa "${separador}" "${colunas}")\n>> Extraindo '$arquivo_tar_gz...'\nLOG da extração: $log\n"
+        cabecalho "${separador}" "${colunas}" "Script: ${programa} v${versao} ${copyright}" "${repositorio}" >> $log
+        printf %b "$data_log - Iniciando extração do arquivo $arquivo_tar_gz\n"  >> $log
+        tar -xvzf ${arquivo_tar_gz} -C ${dir_lib_jvm} >> $log
         printf %b "$data_log Fim.\n" >> $log
     fi
 }
@@ -159,8 +167,8 @@ extrai_arquivo()
 atualiza_env()
 {
     # Backup de environment
-    printf %b "${separa}\n"
-    cp -v /etc/environment /etc/environment_${data_bkp}_bkp
+    printf %b "$(separa "${separador}" "${colunas}")\n"
+    cp -v /etc/environment /etc/environment_${data_arquivo}_bkp
 
     # Edita o PATH de environment
     cat << EOF > /etc/environment
@@ -178,7 +186,7 @@ EOF
 update()
 {
     # Comandos no terminal:
-    printf %b "${separa}\n"
+    printf %b "$(separa "${separador}" "${colunas}")\n"
     update-alternatives --install "/usr/bin/java" "java" "${dir_lib_jvm}/${vjdk}/bin/java" 0
     update-alternatives --set java ${dir_lib_jvm}/${vjdk}/bin/java
     update-alternatives --list java
@@ -190,14 +198,14 @@ update()
 mensagem_final()
 {
     cat << EOF
-$separa
+$(separa "${separador}" "${colunas}")
 A instalação terminou.
 Caso o seu Netbeans já esteja instalado, atualize  valor de 'netbeans_jdkhome'
 no arquivo '~/netbeans-v.v/etc/netbeans.conf'.
 
 Exemplo:
-netbeans_jdkhome="${dir_lib_jvm}/${vjdk}"
-$separa
+    netbeans_jdkhome="${dir_lib_jvm}/${vjdk}"
+$(separa "${separador}" "${colunas}")
 Vovolinux: Sem trauma e sem teoria!
 
 EOF
@@ -206,33 +214,50 @@ EOF
 #--------------------------------- FIM-FUNÇÕES --------------------------------<
 
 
-# Obtém sources
-get_sources
 
 # Programa começa aqui :)
-cabecalho
+printf %b "\n"
+
+# Mensagem de cabecalho
+cabecalho "-" "80" "Script: ${programa} v${versao} ${copyright}" "${repositorio}"
 
 # Encerra se não for r00t
-#somente_root
+somente_root
 
-# Atualiza a lista de distros testadas
-#set_distros
+# Distros testadas
+distros=(
+    'Ubuntu 20.04 LTS'
+    'Ubuntu 19.10'
+    'Linux Mint 19.3'
+    'Linux Mint 19.2'
+)
+
 
 # Verifica se o script já foi testado com a distribuição atual
-#verifica_distro
+verifica_distro "${dir_shell_util}/menu"
 
 # Verifica se o arquivo está no mesmo diretório do script e atualiza a variável 'arquivo_tar_gz'
-#arquivo_tar_gz=$(require ${PWD} ${arquivo_tar_gz} ${download})
+arquivo_tar_gz=$(require ${PWD} ${arquivo_tar_gz} ${download})
+
+# Encerra caso o require não encontre o arquivo_tar_gz na mesma pasta do script
+if [[ $? -ne 0 ]]; then
+    printf %b "${arquivo_tar_gz}\n"
+    exit 1
+fi
+
+printf %b "Verificando a versão do jdk8 -> "
 
 # Atualiza a variavel com a versão do jdk baixado
-#vjdk=$(tar -tzf ${arquivo_tar_gz} | grep jre/LICENSE | cut -d '/' -f1)
+vjdk=$(tar -tzf ${arquivo_tar_gz} | grep jre/LICENSE | cut -d '/' -f1)
+printf %b "${vjdk}\n"
 
 # Atualiza a variável do nome do arquivo de log
-#log="/var/log/tar_xvzf_jdk-8u_$($vjdk | cut -d '_' -f2).log"
+log="/var/log/tar_xvzf_jdk-8u_$vjdk_$(date_format Ymd_HMS).log"
 
-#extrai_arquivo
-#atualiza_env
-#update
+extrai_arquivo
+atualiza_env
+update
+printf %b "\n"
 
 # Exibe a versão instalada
 java -version
