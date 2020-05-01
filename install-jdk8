@@ -24,6 +24,7 @@
 #   - Incluída a função somente_root;
 #   - Incluída a função dependencias;
 #   - Movida a variavel distros para a sessão --- VARIÁVEIS ---
+#   - Método 'update()' renomeado para 'update_alternatives()'
 #
 # 2020-04-26 - v1.0.2 - Vovolinux:
 #   - Detecção de arquivos 'jdk-8u*-linux-*.tar.gz' no diretório do script.
@@ -186,6 +187,8 @@ somente_root()
 }
 
 # Oferece uma versão para download pelo terminal
+# Step 1:
+# Download the latest JDK(jdk-8u241-linux-x64.tar.gz) from this official site.
 oferece_download(){
 
     #link="https://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/jdk-8u251-linux-x64.tar.gz"
@@ -215,6 +218,14 @@ oferece_download(){
 
 
 # Extrai o arquivo_tar_gz
+# Step 2:
+# sudo mkdir /usr/lib/jvm
+# 
+# Step 3:
+# Enter the following command to change the directory.
+# 
+# Step 4:
+# Extract the jdk-8u*-linux-*.tar.gz file in that directory.
 extrai_arquivo()
 {
     # Atualiza o nome do arquivo de log
@@ -222,12 +233,15 @@ extrai_arquivo()
 
     # Cria o diretório
     if [[ -e "./${arquivo_tar_gz}" ]]; then
+        # Step 3:
+        # Enter the following command to change the directory.
         printf %b ">> Criando diretório jvm...\n"
         if ! [[ -e "${dir_lib_jvm}" ]]; then
             mkdir -v "${dir_lib_jvm}"
         fi
-
         # Extrai para o diretório criado e grava no log
+        # Step 4:
+        # Extract the jdk-8u*-linux-*.tar.gz file in that directory.
         printf %b "$(separa "${separador}" "${colunas}")\n>> Extraindo '$arquivo_tar_gz...'\nLOG da extração: $log\n"
         sessao_texto "${separador}" "${colunas}" "${cabecalho}" >> $log
         printf %b "$(date_format Y-m-d_H:M:S) - Iniciando extração do arquivo $arquivo_tar_gz\n"  >> $log
@@ -237,6 +251,12 @@ extrai_arquivo()
 }
 
  # Atualiza /etc/environment
+Step 5:
+Enter the following command to open the environment variables file.
+
+Step 6:
+In the opened file, add the following bin folders to the existing PATH variable.
+
 atualiza_env()
 {
     # Backup de /etc/environment
@@ -263,8 +283,13 @@ DERBY_HOME="${dir_lib_jvm}/${vjdk}/db"
 EOF
 }
 
-# Update e set
-update()
+# install, set e list, para informar o sistema sobre a localização do Java. 
+# Step 7:
+# Enter the following commands to inform the system about the Java's location. Depending on your JDK version, the paths can be different.
+#
+# Step 8:
+# To verify the setup enter the following commands and make sure that they print the location of java and javac as you have provided in the previous step.
+update_alternatives()
 {
     # Comandos no terminal:
     printf %b "$(separa "${separador}" "${colunas}")\n"
@@ -337,9 +362,8 @@ extrai_arquivo
 # Atualiza /etc/environment
 atualiza_env
 
-
-update
-
+# Instala, seta e verifica o java.
+update_alternatives
 
 # Exibe a versão instalada
 java -version
