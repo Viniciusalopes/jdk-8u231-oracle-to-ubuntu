@@ -21,7 +21,9 @@
 #   - Revisão dos comentários de linha;
 #   - Incluída a função oferece_download;
 #   - Incluída a variável instruc_download;
-#
+#   - Incluída a função somente_root;
+#   - Incluída a função dependencias;
+#   - Movida a variavel distros para a sessão --- VARIÁVEIS ---
 #
 # 2020-04-26 - v1.0.2 - Vovolinux:
 #   - Detecção de arquivos 'jdk-8u*-linux-*.tar.gz' no diretório do script.
@@ -69,6 +71,14 @@ cabecalho="Script: ${programa} v${versao} - ${copyright}\n${repositorio}"
 
 # Mensagem de rodapé
 rodape=" Vovolinux: Sem trauma e sem teoria!"
+
+# Distros testadas
+distros=(
+    'Ubuntu 20.04 LTS'
+    'Ubuntu 19.10'
+    'Linux Mint 19.3'
+    'Linux Mint 19.2'
+)
 
 ### VARIÁVEIS DO SISTEMA OPERACIONAL ###
 
@@ -119,47 +129,61 @@ sources=('so')
 
 #-------------------------------- DEPENDÊNCIAS -------------------------------->
 
-printf %b "Verificando dependências...\n"
+# Verifica dependências, faz o download se for o caso, e importa em seguida.
+dependencias()
+{
+    printf %b "Verificando dependências...\n"
 
-# Cria o diretório temporário para scripts auxiliares se não existir
-if ! [[ -d ${dir_shell_util} ]]; then
-    mkdir -v "${dir_shell_util}"
-fi
-
-# Define a dependência para download
-dep="${dir_shell_util}/${sources[0]}"
-
-printf %b "> ${dep} -> "
-
-# Download 
-if [[ -f ${dep} ]]; then
-    printf %b "OK\n"
-else
-    printf %b "Não encontrada.\n"
-    wget -v ${raw_shell_util}/${sources[0]} -O "${dep}"
-
-    # Encerra se não conseguir fazer o download do arquivo
-    if [[ $? -ne 0 ]]; then
-        rm -rf "${dep}"
-        exit 1
+    # Cria o diretório temporário para scripts auxiliares se não existir
+    if ! [[ -d ${dir_shell_util} ]]; then
+        mkdir -v "${dir_shell_util}"
     fi
-fi
 
-# Inclui a dependencia principal
-printf %b "> ${dep} -> "
-source "${dep}"
-printf %b "OK\n"
+    # Define a dependência para download
+    dep="${dir_shell_util}/${sources[0]}"
 
-# Dependencias de Operações com texto, Menus e específicas para o jdk8
-sources=('texto' 'menu')
+    printf %b "> ${dep} -> "
 
-# Inclui demais dependencias de sources()
-get_sources "${dir_shell_util}" "${raw_shell_util}" ""
+    # Download 
+    if [[ -f ${dep} ]]; then
+        printf %b "OK\n"
+    else
+        printf %b "Não encontrada.\n"
+        wget -v ${raw_shell_util}/${sources[0]} -O "${dep}"
+
+        # Encerra se não conseguir fazer o download do arquivo
+        if [[ $? -ne 0 ]]; then
+            rm -rf "${dep}"
+            exit 1
+        fi
+    fi
+
+    # Inclui a dependencia principal
+    printf %b "> ${dep} -> "
+    source "${dep}"
+    printf %b "OK\n"
+
+    # Dependencias de Operações com texto, Menus e específicas para o jdk8
+    sources=('texto' 'menu')
+
+    # Inclui demais dependencias de sources()
+    get_sources "${dir_shell_util}" "${raw_shell_util}" ""
+}
 
 #------------------------------------------------------------------------------|
 
 
 #----------------------------------- FUNÇÕES ---------------------------------->
+
+# Encerra o script se não estiver sendo executado como r00t.
+somente_root()
+{
+    # é root?
+    [[ ${UID} -ne 0 ]] && {  
+        printf %b "Execute como r00t.\n"
+        exit 1
+    }
+}
 
 # Oferece uma versão para download pelo terminal
 oferece_download(){
@@ -250,6 +274,7 @@ update()
     update-alternatives --install "/usr/bin/javac" "javac" "${dir_lib_jvm}/${vjdk}/bin/javac" 0
     update-alternatives --set javac ${dir_lib_jvm}/${vjdk}/bin/javac
     update-alternatives --list javac
+    printf %b "\n"
 }
 
 mensagem_final()
@@ -263,34 +288,24 @@ no arquivo '~/netbeans-v.v/etc/netbeans.conf'.
 Exemplo:
     netbeans_jdkhome="${dir_lib_jvm}/${vjdk}"
 $(separa "${separador}" "${colunas}")
-Vovolinux: Sem trauma e sem teoria!
+sessao_texto "${separador}" "${colunas}" "${rodape}"
 
 EOF
 }
 
 #--------------------------------- FIM-FUNÇÕES --------------------------------<
 
-
-
 # Programa começa aqui :)
 printf %b "\n"
-
-sessao_texto "${separador}" "${colunas}" "${cabecalho}"
 
 # Encerra se não for r00t
 somente_root
 
-printf %b "saida somente_root: $?\n"
-sessao_texto "${separador}" "${colunas}" "${rodape}"
+# Verifica dependências
+dependencias
 
-# Distros testadas
-distros=(
-    'Ubuntu 20.04 LTS'
-    'Ubuntu 19.10'
-    'Linux Mint 19.3'
-    'Linux Mint 19.2'
-)
-
+# Imprime o cabeçalho
+sessao_texto "${separador}" "${colunas}" "${cabecalho}"
 
 # Verifica se o script já foi testado com a distribuição atual
 verifica_distro "${dir_shell_util}/menu"
@@ -313,15 +328,21 @@ printf %b "${vjdk}\n"
 # Atualiza a variável do nome do arquivo de log
 log="/var/log/tar_xvzf_jdk-8u_$vjdk_$(date_format Ymd_HMS).log"
 
+# Oferece o download automáGico ;)
 oferece_download
 
+# Extrai o arquivo tar_gz
 extrai_arquivo
 
+# Atualiza /etc/environment
 atualiza_env
+
+
 update
-printf %b "\n"
+
 
 # Exibe a versão instalada
 java -version
 
+# Exibe a mensagem final (rodapé)
 mensagem_final
