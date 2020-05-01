@@ -71,8 +71,7 @@ date_format(){
         "Ymd_HMS")
             printf %b "$(date "+%Y%m%d_%H%M%S")";;
         "Y-m-d_H:M:S")
-            printf %b "$(date "+%Y%m%d_%H%M%S")";;
-        
+            printf %b "$(date "+%Y-%m%-d_%H:%M:%S")";;
         *) printf %b "$(date)"
     esac
 }
