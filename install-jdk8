@@ -6,11 +6,23 @@
 # HOMEPAGE          : https://vovolinux.com.br 
 # DATA DE CRIAÇÃO   : 15/12/2019 às 21:07 
 # PROGRAMA          : install-jdk8
-# VERSÃO            : 1.0.2
+# VERSÃO            : 1.0.3
 # LICENÇA           : MIT - © 2020 - Vovolinux
 # PEQUENA DESCRIÇÃO : Instalação do Java SE Development Kit 8 para GNU/Linux
 # 
+# FONTE: Install Oracle JDK 8 on Linux
+#        <https://www.javahelps.com/2015/03/install-oracle-jdk-in-ubuntu.html>
+# 
 # CHANGELOG :
+# 2020-05-01 - v1.0.3 - Vovolinux:
+#   - Removida a variável data_arquivo;
+#   - Removida a variável data_log;
+#   - Alterado o nome do arquivo de log;
+#   - Revisão dos comentários de linha;
+#   - Incluída a função oferece_download;
+#   - Incluída a variável instruc_download;
+#
+#
 # 2020-04-26 - v1.0.2 - Vovolinux:
 #   - Detecção de arquivos 'jdk-8u*-linux-*.tar.gz' no diretório do script.
 #   - Detecção automáGica da versão do JDK a ser instalado.
@@ -73,7 +85,6 @@ raw_shell_util='https://raw.githubusercontent.com/Viniciusalopes/jdk8-oracle-for
 # Link para download do jdk
 download='https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html'
 
-
 ### VARIÁVEIS DE DIRETÓRIOS E ARQUIVOS ###
 
 # Diretório para scripts auxiliares e dependências
@@ -85,20 +96,17 @@ dir_lib_jvm='/usr/lib/jvm'
 # Arquivo de instalação do jdk
 arquivo_tar_gz="jdk-8u*-linux-${arquitetura}.tar.gz"
 
+# Instruções para download caso não encontre o arquivo 
+instruc_download=">> Faça o download manualmente em:\n   ${download}\n>> e salve o arquivo no diretório:\n   '${PWD}/'.\n"
+
 # Arquivo de log
-log="/var/log/install-jdk_${versao}_${autor}.log"
+log=''
 
 # Versão do jdk
 vjdk=''
 
 # Dependências e scripts auxiliares
 sources=('so')
-
-# Data atual para nome de arquivo
-data_arquivo=''
-
-# Data atual para escrever no log
-data_log=''
 
 #------------------------------- FIM-VARIÁVEIS --------------------------------<
 
@@ -112,6 +120,7 @@ if ! [[ -d ${dir_shell_util} ]]; then
     mkdir -v "${dir_shell_util}"
 fi
 
+# Define a dependência para download
 dep="${dir_shell_util}/${sources[0]}"
 
 printf %b "> ${dep} -> "
@@ -144,9 +153,40 @@ get_sources "${dir_shell_util}" "${raw_shell_util}" ""
 
 #----------------------------------- FUNÇÕES ---------------------------------->
 
+# Oferece uma versão para download pelo terminal
+oferece_download(){
+
+    #link="https://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/jdk-8u251-linux-x64.tar.gz"
+    #link="https://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/jdk-8u251-linux-i586.tar.gz"
+    #vinicius@VINICIUS-NB:/tmp$ rm jdk-8u251-linux-x64.tar.gz 
+    #vinicius@VINICIUS-NB:/tmp$ wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" ${link}
+    
+    local _vjdk='251'
+    local _url='https://download.oracle.com/otn-pub/java/jdk/8u251-b08'
+    local _key='3d5a2bb8f8d4428bbe94aed7ec7ae784'
+    local _arquivos=(
+        "jdk-8u${_vjdk}-linux-x64.tar.gz"
+        "jdk-8u${_vjdk}-linux-i586.tar.gz"
+    )
+                          
+    local texto="Este programa pode fazer o download do arquivo 'jdk-8u${_vjdk}-linux-${arquitetura}.tar.gz'\n"
+    local texto="${texto}Deseja fazer o download automaGicamente?"
+    if [[ $(pergunta_sn ${texto}) -eq 1 ]]; then
+        "Ouquei...\n${instruc_download}\n"
+        exit 1
+    else
+        exit 1
+    fi
+
+}
+
+
 # Extrai o arquivo_tar_gz
 extrai_arquivo()
 {
+    # Atualiza o nome do arquivo de log
+    log="/var/log/install-jdk_${versao}_${autor}_(date_format Ymd_HMS).log"
+
     # Cria o diretório
     if [[ -e "./${arquivo_tar_gz}" ]]; then
         printf %b ">> Criando diretório jvm...\n"
@@ -154,26 +194,34 @@ extrai_arquivo()
             mkdir -v "${dir_lib_jvm}"
         fi
 
-        # Extrai para o diretório criado
+        # Extrai para o diretório criado e grava no log
         printf %b "$(separa "${separador}" "${colunas}")\n>> Extraindo '$arquivo_tar_gz...'\nLOG da extração: $log\n"
         cabecalho "${separador}" "${colunas}" "Script: ${programa} v${versao} ${copyright}" "${repositorio}" >> $log
-        printf %b "$data_log - Iniciando extração do arquivo $arquivo_tar_gz\n"  >> $log
+        printf %b "$(date_format Y-m-d_H:M:S) - Iniciando extração do arquivo $arquivo_tar_gz\n"  >> $log
         tar -xvzf ${arquivo_tar_gz} -C ${dir_lib_jvm} >> $log
-        printf %b "$data_log Fim.\n" >> $log
+        printf %b "$(date_format Y-m-d_H:M:S) Fim.\n" >> $log
     fi
 }
 
  # Atualiza /etc/environment
 atualiza_env()
 {
-    # Backup de environment
+    # Backup de /etc/environment
     printf %b "$(separa "${separador}" "${colunas}")\n"
-    cp -v /etc/environment /etc/environment_${data_arquivo}_bkp
+    cp -v /etc/environment /etc/environment_$(date_format Ymd_HMS)_bkp
+
+    # Paths que serão incluídos
+    local paths=(
+        ":${dir_lib_jvm}/${vjdk}/bin"
+        ":${dir_lib_jvm}/${vjdk}/db/bin"
+        ":${dir_lib_jvm}/${vjdk}/jre/bin"
+    )
+
 
     # Edita o PATH de environment
     cat << EOF > /etc/environment
-# UPDATE BY Vovolinux <https://github.com/Viniciusalopes/jdk-8u241-oracle-to-ubuntu>
-# DATA: ${data_log}
+# UPDATE BY Vovolinux <${repositorio}>
+# DATA: $(date_format Y-m-d_H:M:S)
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:${dir_lib_jvm}/${vjdk}/bin:${dir_lib_jvm}/${vjdk}/db/bin:${dir_lib_jvm}/${vjdk}/jre/bin"
 J2SDKDIR="${dir_lib_jvm}/${vjdk}"
 J2REDIR="${dir_lib_jvm}/${vjdk}/jre"
@@ -237,7 +285,9 @@ distros=(
 verifica_distro "${dir_shell_util}/menu"
 
 # Verifica se o arquivo está no mesmo diretório do script e atualiza a variável 'arquivo_tar_gz'
-arquivo_tar_gz=$(require ${PWD} ${arquivo_tar_gz} ${download})
+printf %b 'requirendo......'
+printf %b " -> ${instruc_download}"
+arquivo_tar_gz=$(require ${PWD} ${arquivo_tar_gz} ${instruc_download})
 
 # Encerra caso o require não encontre o arquivo_tar_gz na mesma pasta do script
 if [[ $? -ne 0 ]]; then
@@ -254,7 +304,10 @@ printf %b "${vjdk}\n"
 # Atualiza a variável do nome do arquivo de log
 log="/var/log/tar_xvzf_jdk-8u_$vjdk_$(date_format Ymd_HMS).log"
 
+oferece_download
+
 extrai_arquivo
+
 atualiza_env
 update
 printf %b "\n"
