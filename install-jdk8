@@ -208,7 +208,7 @@ oferece_download(){
     local texto="${texto}Deseja fazer o download automaGicamente?"
     if [[ $(pergunta_sn ${texto}) -eq 1 ]]; then
         "Ouquei...\n${instruc_download}\n"
-        sessao_texto "${separador}" "${colunas}" "${cabecalho}"
+        printf %b $(sessao_texto "${separador}" "${colunas}" "${cabecalho}")
         exit 1
     else
         exit 1
