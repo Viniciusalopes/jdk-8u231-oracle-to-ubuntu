@@ -76,24 +76,29 @@ date_format(){
     esac
 }
 
-# Imprime um cabeçalho
+# Imprime uma seção de texto com semparadores
 # $1 = caractere do separador
 # $2 = quantidade de colunas
-# $3 = Título principal
-# $4 = Subtítulo
+# $3 = texto
 # Exemplo:
 #   cabecalho "-" 80 "TÍTULO" "Subtitulo"
 # Saída:
 #   --------------------------------------------------------------------------------
-#   TÍTULO
-#   Subtitulo
+#   EXEMPLO DE TEXTO
+#   Mussum Ipsum, cacilds vidis litro abertis. Delegadis gente finis, bibendum 
+#   egestas augue arcu ut est. 
+#   
+#   Em pé sem cair, deitado sem dormir, sentado sem cochilar e fazendo pose.
+#   Todo mundo vê os porris que eu tomo, mas ninguém vê os tombis que eu levo!
+#   Copo furadis é disculpa de bebadis, arcu quam euismod magna.
+#
+#   FONTE: <https://mussumipsum.com/>
 #   --------------------------------------------------------------------------------
-cabecalho()
+sessao_texto()
 {
     cat << EOF
 $(separa $1 $2)
 $3
-$4
 $(separa $1 $2)
 EOF
 }
