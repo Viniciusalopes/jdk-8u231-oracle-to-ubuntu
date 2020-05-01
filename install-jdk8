@@ -146,7 +146,9 @@ else
 fi
 
 # Inclui a dependencia principal
+printf %b "> ${dep} -> "
 source "${dep}"
+printf %b "OK\n"
 
 # Dependencias de Operações com texto, Menus e específicas para o jdk8
 sources=('texto' 'menu')
