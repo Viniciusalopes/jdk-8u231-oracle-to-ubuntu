@@ -53,7 +53,7 @@ autor='Vovolinux'
 programa='install-jdk8'
 
 # Versão
-versao='1.0.2'
+versao='1.0.3'
 
 # Ano atual
 ano=$(date "+%Y")
@@ -66,6 +66,9 @@ separador='-'
 
 # Quantidade de colunas para exibição no CLI
 colunas=80
+
+# Repositório deste script
+repositorio='https://github.com/Viniciusalopes/jdk8-oracle-for-linux'
 
 # Mensagem de cabecalho
 cabecalho="Script: ${programa} v${versao} - ${copyright}\n${repositorio}"
@@ -92,9 +95,6 @@ fi
 
 
 ### VARIÁVEIS PARA LINKS WEB ###
-
-# Repositório deste script
-repositorio='https://github.com/Viniciusalopes/jdk8-oracle-for-linux'
 
 # Caminho para download dos scripts auxiliares de shell-util
 raw_shell_util='https://raw.githubusercontent.com/Viniciusalopes/jdk8-oracle-for-linux/master/shell-util/'
