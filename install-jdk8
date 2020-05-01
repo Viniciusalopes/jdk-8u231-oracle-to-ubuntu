@@ -71,7 +71,7 @@ colunas=80
 repositorio='https://github.com/Viniciusalopes/jdk8-oracle-for-linux'
 
 # Mensagem de cabecalho
-cabecalho="Script: ${programa} v${versao} - ${copyright}\n${repositorio}"
+cabecalho="Script: ${programa} v${versao} - ${copyright}\n<${repositorio}>"
 
 # Mensagem de rodapé
 rodape=" Vovolinux: Sem trauma e sem teoria!"
@@ -206,7 +206,7 @@ oferece_download(){
                           
     local texto="Este programa pode fazer o download do arquivo 'jdk-8u${_vjdk}-linux-${arquitetura}.tar.gz'\n"
     local texto="${texto}Deseja fazer o download automaGicamente?"
-    if [[ $(pergunta_sn ${texto}) -eq 1 ]]; then
+    if [[ $(pergunta_sn "${texto}") -eq 1 ]]; then
         "Ouquei...\n${instruc_download}\n"
         printf %b $(sessao_texto "${separador}" "${colunas}" "${cabecalho}")
         exit 1
@@ -330,17 +330,21 @@ somente_root
 dependencias
 
 # Imprime o cabeçalho
-sessao_texto "${separador}" "${colunas}" "${cabecalho}"
+printf %b "$(sessao_texto "${separador}" "${colunas}" "${cabecalho}")\n"
 
 # Verifica se o script já foi testado com a distribuição atual
 verifica_distro "${dir_shell_util}/menu"
 
+# Oferece o download automáGico ;)
+oferece_download
+
 # Verifica se o arquivo está no mesmo diretório do script e atualiza a variável 'arquivo_tar_gz'
-arquivo_tar_gz=$(require "${PWD}" "${arquivo_tar_gz}" "${instruc_download}\n${cabecalho}")
+arquivo_tar_gz=$(require "${PWD}" "${arquivo_tar_gz}" "${instruc_download}")
 
 # Encerra caso o require não encontre o arquivo_tar_gz na mesma pasta do script
 if [[ $? -ne 0 ]]; then
     printf %b "${arquivo_tar_gz}\n"
+    printf %b "$(sessao_texto "${separador}" "${colunas}" "${rodape}")\n"
     exit 1
 fi
 
@@ -352,9 +356,6 @@ printf %b "${vjdk}\n"
 
 # Atualiza a variável do nome do arquivo de log
 log="/var/log/tar_xvzf_jdk-8u_$vjdk_$(date_format Ymd_HMS).log"
-
-# Oferece o download automáGico ;)
-oferece_download
 
 # Extrai o arquivo tar_gz
 extrai_arquivo
