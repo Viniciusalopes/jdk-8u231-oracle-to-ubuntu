@@ -71,7 +71,7 @@ colunas=80
 repositorio='https://github.com/Viniciusalopes/jdk8-oracle-for-linux'
 
 # Mensagem de cabecalho
-cabecalho="Script: ${programa} v${versao} - ${copyright}\n${repositorio}"
+cabecalho="Script: ${programa} v${versao} \- ${copyright}\n${repositorio}"
 
 # Mensagem de rodapé
 rodape=" Vovolinux: Sem trauma e sem teoria!"
