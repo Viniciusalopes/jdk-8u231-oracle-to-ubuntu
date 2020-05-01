@@ -285,9 +285,7 @@ distros=(
 verifica_distro "${dir_shell_util}/menu"
 
 # Verifica se o arquivo está no mesmo diretório do script e atualiza a variável 'arquivo_tar_gz'
-printf %b 'requirendo......'
-printf %b " -> ${instruc_download}"
-arquivo_tar_gz=$(require ${PWD} ${arquivo_tar_gz} ${instruc_download})
+arquivo_tar_gz=$(require "${PWD}" "${arquivo_tar_gz}" "${instruc_download}")
 
 # Encerra caso o require não encontre o arquivo_tar_gz na mesma pasta do script
 if [[ $? -ne 0 ]]; then
