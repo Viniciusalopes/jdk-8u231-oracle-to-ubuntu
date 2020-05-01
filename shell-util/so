@@ -95,16 +95,16 @@ verifica_distro()
 # o nome do arquivo no diretório e exibe link para download.
 # $1 = diretório
 # $2 = nome do arquivo
-# #3 = link para download
+# $3 = instruções para download
 require()
 {
+    printf %b "$3\n"
     # Verifica se passou dois ou mais argumentos para a função
     if [[ $# -ge 2 ]]; then
         if [[ $(find $1 -iname $2 | wc -l) -eq 0 ]]; then  # Busca por arquivos com o nome
             printf %b ">> Não foi possível encontrar '${2}': Arquivo inexistente.\n"
             if [[ $# -ge 3 ]]; then
-                printf %b ">> Faça o download em:\n   ${3}\n"
-                printf %b ">> e salve o arquivo no diretório:\n   '${1}/'.\n"
+                printf %b "${3}"
             fi
             exit 1
         else
