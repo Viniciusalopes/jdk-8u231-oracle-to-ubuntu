@@ -250,12 +250,12 @@ extrai_arquivo()
     fi
 }
 
- # Atualiza /etc/environment
-Step 5:
-Enter the following command to open the environment variables file.
-
-Step 6:
-In the opened file, add the following bin folders to the existing PATH variable.
+# Atualiza /etc/environment
+# Step 5:
+# Enter the following command to open the environment variables file.
+# 
+# Step 6:
+# In the opened file, add the following bin folders to the existing PATH variable.
 
 atualiza_env()
 {
