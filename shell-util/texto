@@ -100,7 +100,7 @@ sessao_texto()
 
     cat << EOF
 $(separa $1 $2)
-$3
+${3}
 $(separa $1 $2)
 EOF > printf %b
 }
