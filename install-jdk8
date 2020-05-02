@@ -148,6 +148,7 @@ dependencias()
     # Download 
     if [[ -f ${dep} ]]; then
         printf %b "OK\n"
+        source "${dep}"
     else
         printf %b "Não encontrada.\n"
         wget -v ${raw_shell_util}/${sources[0]} -O "${dep}"
@@ -157,12 +158,12 @@ dependencias()
             rm -rf "${dep}"
             exit 1
         fi
-    fi
 
-    # Inclui a dependencia principal
-    printf %b "> ${dep} -> "
-    source "${dep}"
-    printf %b "OK\n"
+        # Inclui a dependencia principal
+        printf %b "> ${dep} -> "
+        source "${dep}"
+        printf %b "OK\n"
+    fi
 
     # Dependencias de Operações com texto, Menus e específicas para o jdk8
     sources=('texto' 'menu')
@@ -204,11 +205,12 @@ oferece_download(){
         "jdk-8u${_vjdk}-linux-i586.tar.gz"
     )
                           
-    local texto="Este programa pode fazer o download do arquivo 'jdk-8u${_vjdk}-linux-${arquitetura}.tar.gz'\n"
-    local texto="${texto}Deseja fazer o download automaGicamente?"
-    if [[ $(pergunta_sn "${texto}") -eq 1 ]]; then
-        "Ouquei...\n${instruc_download}\n"
-        printf %b $(sessao_texto "${separador}" "${colunas}" "${cabecalho}")
+    printf %b "Este programa pode fazer o download do arquivo 'jdk-8u${_vjdk}-linux-${arquitetura}.tar.gz'\n"
+    pergunta_sn "Deseja fazer o download automaGicamente?"
+
+    if [[ $? -eq 1 ]]; then
+        printf %b "Ouquei...\n\n${instruc_download}"
+        printf %b "$(sessao_texto "${separador}" "${colunas}" "${rodape}")\n"
         exit 1
     else
         exit 1
