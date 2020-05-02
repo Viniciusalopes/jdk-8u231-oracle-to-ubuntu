@@ -23,8 +23,9 @@
 #   - Incluída a variável instruc_download;
 #   - Incluída a função somente_root;
 #   - Incluída a função dependencias;
-#   - Movida a variavel distros para a sessão --- VARIÁVEIS ---
-#   - Método 'update()' renomeado para 'update_alternatives()'
+#   - Movida a variavel distros para a sessão --- VARIÁVEIS ---;
+#   - Método 'update()' renomeado para 'update_alternatives()';
+#   - Incluída a exibição da fonte deste script na saída padrão;
 #
 # 2020-04-26 - v1.0.2 - Vovolinux:
 #   - Detecção de arquivos 'jdk-8u*-linux-*.tar.gz' no diretório do script.
@@ -70,9 +71,13 @@ colunas=80
 # Repositório deste script
 repositorio='https://github.com/Viniciusalopes/jdk8-oracle-for-linux'
 
-# Mensagem de cabecalho
-cabecalho="Script: ${programa} v${versao} - ${copyright}\n<${repositorio}>"
+# Fonte deste script
+fonte='https://www.javahelps.com/2015/03/install-oracle-jdk-in-ubuntu.html'
+info_fonte="FONTE: Install Oracle JDK 8 on Linux\n <${fonte}>"
 
+# Mensagem de cabecalho
+cabecalho="Script . . : ${programa} v${versao} - ${copyright}\nRepositório: <${repositorio}>\n${info_fonte}"
+            
 # Mensagem de rodapé
 rodape=" Vovolinux: Sem trauma e sem teoria!"
 
@@ -113,11 +118,14 @@ dir_lib_jvm='/usr/lib/jvm'
 # Arquivo de instalação do jdk
 arquivo_tar_gz="jdk-8u*-linux-${arquitetura}.tar.gz"
 
-# Instruções para download caso não encontre o arquivo 
-instruc_download=">> Faça o download manualmente em:\n   ${download}\n>> e salve o arquivo no diretório:\n   '${PWD}/'.\n"
+# Diretório do arquivo de log
+dir_log='/var/log/install-jdk-vovolinux'
 
 # Arquivo de log
 log=''
+
+# Instruções para download caso não encontre o arquivo 
+instruc_download=">> Faça o download manualmente em:\n   ${download}\n>> e salve o arquivo no diretório:\n   '${PWD}/'.\n"
 
 # Versão do jdk
 vjdk=''
@@ -196,16 +204,21 @@ oferece_download(){
     #link="https://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/jdk-8u251-linux-i586.tar.gz"
     #vinicius@VINICIUS-NB:/tmp$ rm jdk-8u251-linux-x64.tar.gz 
     #vinicius@VINICIUS-NB:/tmp$ wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" ${link}
-    
     local _vjdk='251'
+    local _arquivo="jdk-8u${_vjdk}-linux-${arquitetura}.tar.gz"
+
+    # Se o arquivo já foi baixado, atualiza o arquivo_tar_gz
+    if [[ -f ${_arquivo} ]]; then
+        arquivo_tar_gz=${_arquivo}
+        return 0
+    fi
+
+    local _cookie='Cookie: oraclelicense=accept-securebackup-cookie'
     local _url='https://download.oracle.com/otn-pub/java/jdk/8u251-b08'
     local _key='3d5a2bb8f8d4428bbe94aed7ec7ae784'
-    local _arquivos=(
-        "jdk-8u${_vjdk}-linux-x64.tar.gz"
-        "jdk-8u${_vjdk}-linux-i586.tar.gz"
-    )
-                          
-    printf %b "Este programa pode fazer o download do arquivo 'jdk-8u${_vjdk}-linux-${arquitetura}.tar.gz'\n"
+    
+
+    printf %b "Este programa pode fazer o download do arquivo '${_arquivo}'\n"
     pergunta_sn "Deseja fazer o download automaGicamente?"
 
     if [[ $? -eq 1 ]]; then
@@ -213,9 +226,8 @@ oferece_download(){
         printf %b "$(sessao_texto "${separador}" "${colunas}" "${rodape}")\n"
         exit 1
     else
-        exit 1
+        wget -c --header "${_cookie}" "${_url}/${_key}/${_arquivo}"
     fi
-
 }
 
 
@@ -230,21 +242,30 @@ oferece_download(){
 # Extract the jdk-8u*-linux-*.tar.gz file in that directory.
 extrai_arquivo()
 {
-    # Atualiza o nome do arquivo de log
-    log="/var/log/install-jdk_${versao}_${autor}_(date_format Ymd_HMS).log"
+    # Atualiza a variável do nome do arquivo de log
+    log="${dir_log}/install-jdk_${versao}_${autor}_$(date_format Ymd_HMS).log"
 
     # Cria o diretório
     if [[ -e "./${arquivo_tar_gz}" ]]; then
         # Step 3:
         # Enter the following command to change the directory.
-        printf %b ">> Criando diretório jvm...\n"
         if ! [[ -e "${dir_lib_jvm}" ]]; then
+            printf %b ">> Criando diretório jvm...\n"
             mkdir -v "${dir_lib_jvm}"
         fi
+        
+        # Cria o diretório do arquivo de log se não existir
+        if ! [[ -e "${dir_log}" ]]; then
+            printf %b ">> Criando diretório de log...\n"
+            mkdir -v ${dir_log}
+        fi
+
+        separa "${separador}" "${colunas}"
+
         # Extrai para o diretório criado e grava no log
         # Step 4:
         # Extract the jdk-8u*-linux-*.tar.gz file in that directory.
-        printf %b "$(separa "${separador}" "${colunas}")\n>> Extraindo '$arquivo_tar_gz...'\nLOG da extração: $log\n"
+        printf %b ">> Extraindo '$arquivo_tar_gz...'\nLOG da extração:\n->$log\n"
         sessao_texto "${separador}" "${colunas}" "${cabecalho}" >> $log
         printf %b "$(date_format Y-m-d_H:M:S) - Iniciando extração do arquivo $arquivo_tar_gz\n"  >> $log
         tar -xvzf ${arquivo_tar_gz} -C ${dir_lib_jvm} >> $log
@@ -262,11 +283,12 @@ extrai_arquivo()
 atualiza_env()
 {
     # Backup de /etc/environment
-    printf %b "$(separa "${separador}" "${colunas}")\n"
+    separa "${separador}" "${colunas}"
+    printf %b ">> Atualizando /etc/environment...\n"
     cp -v /etc/environment /etc/environment_$(date_format Ymd_HMS)_bkp
 
     # Paths que serão incluídos
-    local paths=(
+    local _paths=(
         ":${dir_lib_jvm}/${vjdk}/bin"
         ":${dir_lib_jvm}/${vjdk}/db/bin"
         ":${dir_lib_jvm}/${vjdk}/jre/bin"
@@ -294,7 +316,8 @@ EOF
 update_alternatives()
 {
     # Comandos no terminal:
-    printf %b "$(separa "${separador}" "${colunas}")\n"
+    separa "${separador}" "${colunas}"
+    printf %b ">> Configurando o Java...\n"
     update-alternatives --install "/usr/bin/java" "java" "${dir_lib_jvm}/${vjdk}/bin/java" 0
     update-alternatives --set java ${dir_lib_jvm}/${vjdk}/bin/java
     update-alternatives --list java
@@ -309,13 +332,12 @@ mensagem_final()
     cat << EOF
 $(separa "${separador}" "${colunas}")
 A instalação terminou.
-Caso o seu Netbeans já esteja instalado, atualize  valor de 'netbeans_jdkhome'
+Caso o seu Netbeans já esteja instalado, atualize o valor de 'netbeans_jdkhome'
 no arquivo '~/netbeans-v.v/etc/netbeans.conf'.
 
 Exemplo:
     netbeans_jdkhome="${dir_lib_jvm}/${vjdk}"
-$(separa "${separador}" "${colunas}")
-sessao_texto "${separador}" "${colunas}" "${rodape}"
+$(sessao_texto "${separador}" "${colunas}" "${rodape}")
 
 EOF
 }
@@ -323,7 +345,6 @@ EOF
 #--------------------------------- FIM-FUNÇÕES --------------------------------<
 
 # Programa começa aqui :)
-printf %b "\n"
 
 # Encerra se não for r00t
 somente_root
@@ -350,14 +371,11 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
-printf %b "Verificando a versão do jdk8 -> "
+printf %b ">> Verificando a versão do jdk8 -> "
 
 # Atualiza a variavel com a versão do jdk baixado
 vjdk=$(tar -tzf ${arquivo_tar_gz} | grep jre/LICENSE | cut -d '/' -f1)
 printf %b "${vjdk}\n"
-
-# Atualiza a variável do nome do arquivo de log
-log="/var/log/tar_xvzf_jdk-8u_$vjdk_$(date_format Ymd_HMS).log"
 
 # Extrai o arquivo tar_gz
 extrai_arquivo
