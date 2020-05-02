@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Encerra o script se não estiver sendo executado como r00t.
+somente_root()
+{
+    # é root?
+    [[ ${UID} -ne 0 ]] && {  
+        printf %b "Execute como r00t.\n"
+        exit 1
+    }
+}
+somente_root
+printf %b "Desinstalando jdk8...\n"
+rm -rfv /var/log/install-jdk-vovolinux/
+rm -rfv /tmp/shell-util/
+rm -rfv /usr/lib/jvm/
+cp -v /etc/environment_ubuntu_20_04 /etc/environment
+rm -rfv ./jdk-8u251-linux-x64.tar.gz
+
