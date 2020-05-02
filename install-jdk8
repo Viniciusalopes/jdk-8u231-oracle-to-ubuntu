@@ -141,6 +141,9 @@ sources=('so')
 # Verifica dependências, faz o download se for o caso, e importa em seguida.
 dependencias()
 {
+    # Linha de separação
+    local _linha="--------------------------------------------------------------------------------"
+    
     printf %b "Verificando dependências...\n"
 
     # Cria o diretório temporário para scripts auxiliares se não existir
@@ -151,7 +154,7 @@ dependencias()
     # Define a dependência para download
     dep="${dir_shell_util}/${sources[0]}"
 
-    printf %b "> ${dep} -> "
+    printf %b "${_linha}\n> ${dep} -> "
 
     # Download 
     if [[ -f ${dep} ]]; then

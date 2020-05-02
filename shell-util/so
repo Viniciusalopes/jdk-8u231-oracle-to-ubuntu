@@ -130,6 +130,9 @@ EOF
 
 get_sources()
 {
+    # Linha de separação
+    local _linha="--------------------------------------------------------------------------------"
+
     # Imprime mensagemde aviso de execução passada pelo argumento $3
     if [[ "$3" -ne "" ]]; then
         printf %b "$3"
@@ -142,8 +145,7 @@ get_sources()
     
     # Download das dependências
     for dep in "${sources[@]}"; do
-        printf %b "---------------------------"
-        separa "${separador}" "${colunas}"
+        printf %b "${_linha}\n"
         printf %b "> $1/$dep -> "
         if [[ -f "$1/$dep" ]]; then
             printf %b "OK\n"
