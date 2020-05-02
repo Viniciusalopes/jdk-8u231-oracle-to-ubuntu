@@ -76,7 +76,7 @@ fonte='https://www.javahelps.com/2015/03/install-oracle-jdk-in-ubuntu.html'
 info_fonte="FONTE: Install Oracle JDK 8 on Linux\n <${fonte}>"
 
 # Mensagem de cabecalho
-cabecalho="Script . . : ${programa} v${versao} - ${copyright}\nRepositório: <${repositorio}>\n${info_fonte}"
+cabecalho="Script: "${programa}" v"${versao}" - "${copyright}"\nRepositório: <"${repositorio}">\n"${info_fonte}""
             
 # Mensagem de rodapé
 rodape=" Vovolinux: Sem trauma e sem teoria!"
@@ -268,11 +268,17 @@ extrai_arquivo()
         # Extrai para o diretório criado e grava no log
         # Step 4:
         # Extract the jdk-8u*-linux-*.tar.gz file in that directory.
-        printf %b ">> Extraindo '$arquivo_tar_gz...'\nLOG da extração:\n->$log\n"
-        sessao_texto "${separador}" "${colunas}" "${cabecalho}" >> $log
-        printf %b "$(date_format Y-m-d_H:M:S) - Iniciando extração do arquivo $arquivo_tar_gz\n"  >> $log
+        
+        printf %b ">> Extraindo '$arquivo_tar_gz...'\nLOG da extração:\n->${log}\n"
+        cat << EOF >> ${log}
+$(printf %b "$(sessao_texto "${separador}" "${colunas}" "${cabecalho}")")
+$(date_format Y-m-d_H:M:S) - Iniciando extração do arquivo
+Arquivo: ${arquivo_tar_gz}
+Local da extração: ${PWD}/
+$(separa "-" 80)
+EOF
         tar -xvzf ${arquivo_tar_gz} -C ${dir_lib_jvm} >> $log
-        printf %b "$(date_format Y-m-d_H:M:S) Fim.\n" >> $log
+        printf %b "$(sessao_texto "${separador}" "${colunas}" "$(date_format Y-m-d_H:M:S) Fim.\n${rodape}")" >> $log
     fi
 }
 
