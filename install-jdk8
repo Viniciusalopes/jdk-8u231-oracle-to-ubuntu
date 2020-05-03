@@ -25,7 +25,8 @@
 #   - Incluída a função dependencias;
 #   - Movida a variavel distros para a sessão --- VARIÁVEIS ---;
 #   - Método 'update()' renomeado para 'update_alternatives()';
-#   - Incluída a exibição da fonte deste script na saída padrão;
+#   - Incluída a exibição da fonte deste script no cabecalho;
+#   - Melhoria na atualização de /etc/environment;
 #
 # 2020-04-26 - v1.0.2 - Vovolinux:
 #   - Detecção de arquivos 'jdk-8u*-linux-*.tar.gz' no diretório do script.
@@ -97,7 +98,6 @@ if [[ $(uname -m) = "x86_64" ]]; then
 else
     arquitetura="i586"
 fi
-
 
 ### VARIÁVEIS PARA LINKS WEB ###
 
@@ -203,14 +203,10 @@ somente_root()
 # Download the latest JDK(jdk-8u241-linux-x64.tar.gz) from this official site.
 oferece_download(){
 
-    #link="https://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/jdk-8u251-linux-x64.tar.gz"
-    #link="https://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/jdk-8u251-linux-i586.tar.gz"
-    #vinicius@VINICIUS-NB:/tmp$ rm jdk-8u251-linux-x64.tar.gz 
-    #vinicius@VINICIUS-NB:/tmp$ wget -c --header "Cookie: oraclelicense=accept-securebackup-cookie" ${link}
     local _vjdk='251'
     local _arquivo="jdk-8u${_vjdk}-linux-${arquitetura}.tar.gz"
 
-    # Se o arquivo já foi baixado, atualiza o arquivo_tar_gz
+    # Se o arquivo já foi baixado, atualiza o arquivo_tar_gz e encerra a função
     if [[ -f ${_arquivo} ]]; then
         arquivo_tar_gz=${_arquivo}
         return 0
@@ -219,7 +215,6 @@ oferece_download(){
     local _cookie='Cookie: oraclelicense=accept-securebackup-cookie'
     local _url='https://download.oracle.com/otn-pub/java/jdk/8u251-b08'
     local _key='3d5a2bb8f8d4428bbe94aed7ec7ae784'
-    
 
     printf %b "Este programa pode fazer o download do arquivo '${_arquivo}'\n"
     pergunta_sn "Deseja fazer o download automaGicamente?"
@@ -232,7 +227,6 @@ oferece_download(){
         wget -c --header "${_cookie}" "${_url}/${_key}/${_arquivo}"
     fi
 }
-
 
 # Extrai o arquivo_tar_gz
 # Step 2:
@@ -294,26 +288,77 @@ atualiza_env()
     # Backup de /etc/environment
     separa "${separador}" "${colunas}"
     printf %b ">> Atualizando /etc/environment...\n"
-    cp -v /etc/environment /etc/environment_$(date_format Ymd_HMS)_bkp
-
+    local _arquivo_bkp="/etc/environment_$(date_format Ymd_HMS)_bkp"
+    cp -v /etc/environment "${_arquivo_bkp}"
+    
+    # Converte o texto da variável PATH em um array()
+    #   NOTA: O array() já é declarado na função to_array()
+    to_array ";:" $(cat /etc/environment | grep "PATH=\"" | cut -d \" -f2)
+    
     # Paths que serão incluídos
     local _paths=(
-        ":${dir_lib_jvm}/${vjdk}/bin"
-        ":${dir_lib_jvm}/${vjdk}/db/bin"
-        ":${dir_lib_jvm}/${vjdk}/jre/bin"
+        "${dir_lib_jvm}/${vjdk}/bin"
+        "${dir_lib_jvm}/${vjdk}/db/bin"
+        "${dir_lib_jvm}/${vjdk}/jre/bin"
     )
 
+    # Inclui o $_paths em $array se nao existir
+    for p in "${_paths[@]}"; do
+        array_contem "${p}" 
+        [[ $? -eq 1 ]] && array+=("${p}")
+    done
 
-    # Edita o PATH de environment
+    # Composição da linha PATH
+    local _path="PATH=\""
+
+    for a in "${array[@]}"; do 
+        _path="${_path}${a}:"
+    done
+    
+    # Troca o : por " no final
+    _path=$(substitui_no_final "${_path}" ":" "\"")
+ 
+    local _flags=(
+        "# DATA DA ATUALIZAÇÃO:"
+        "PATH=\""
+        "J2SDKDIR=\""
+        "J2REDIR=\""
+        "JAVA_HOME=\""
+        "DERBY_HOME=\""
+    )
+
+    # Salva o conteúdo do arquivo em array() de linhas
+    file_to_array /etc/environment
+    
+    # Novo conteúdo de '/etc/environment'
     cat << EOF > /etc/environment
-# UPDATE BY Vovolinux <${repositorio}>
-# DATA: $(date_format Y-m-d_H:M:S)
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:${dir_lib_jvm}/${vjdk}/bin:${dir_lib_jvm}/${vjdk}/db/bin:${dir_lib_jvm}/${vjdk}/jre/bin"
+# UPDATE BY: Vovolinux <${repositorio}>
+# DATA DA ATUALIZAÇÃO: $(date_format Y-m-d_H:M:S)
+${_path}
 J2SDKDIR="${dir_lib_jvm}/${vjdk}"
 J2REDIR="${dir_lib_jvm}/${vjdk}/jre"
 JAVA_HOME="${dir_lib_jvm}/${vjdk}"
 DERBY_HOME="${dir_lib_jvm}/${vjdk}/db"
 EOF
+    # Busca variáveis no arquivo não foram modificadas
+    for linha in "${array[@]}"; do # Para cada linha de '/etc/environment'
+        local _encontrou=1
+        for f in "${_flags[@]}"; do     # Para cada flag
+            texto_contem "${linha}" "${f}"  # Testa se a linha contém a flag
+            if [[ $? -eq 0 ]]; then
+                _encontrou=0
+            fi
+        done
+        
+        # Inclui as linhas que não foram modificadas e já estavam no arquivo
+        if [[ $_encontrou -ne 0 ]]; then
+            printf %b "${linha}\n" >> /etc/environment 
+        fi
+    done
+
+    separa "${separador}" "${colunas}"
+    printf %b "/etc/environment tepois:\n"
+    cat /etc/environment
 }
 
 # install, set e list, para informar o sistema sobre a localização do Java. 
