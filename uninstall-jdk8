@@ -14,5 +14,4 @@ rm -rfv /var/log/install-jdk-vovolinux/
 rm -rfv /tmp/shell-util/
 rm -rfv /usr/lib/jvm/
 cp -v /etc/environment_ubuntu_20_04 /etc/environment
-rm -rfv ./jdk-8u251-linux-x64.tar.gz
 
