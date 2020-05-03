@@ -355,10 +355,6 @@ EOF
             printf %b "${linha}\n" >> /etc/environment 
         fi
     done
-
-    separa "${separador}" "${colunas}"
-    printf %b "/etc/environment tepois:\n"
-    cat /etc/environment
 }
 
 # install, set e list, para informar o sistema sobre a localização do Java. 
