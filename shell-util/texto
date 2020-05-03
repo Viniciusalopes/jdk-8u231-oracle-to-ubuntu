@@ -46,22 +46,6 @@ separa()
     printf %b "\n"
 }
 
-# Verifica se o array contém o texto procurado
-# $array() deve ser declarado antes pelo chamador, de forma global
-# $1 = Texto procurado
-# $2 = Frase para não encontrado
-# Retorno: 0 = encontrou; 1 = não econtrou
-array_contem()
-{
-    # Flag para continuar o script
-    for a in "${array[@]}"; do
-        if [[ "${a}" == "$1" ]]; then
-            return 0
-        fi
-    done
-    return 1
-}
-
 # Imprime a data em um formato passado por parametro
 # $1 = Formato para a saída da data
 date_format(){
@@ -104,4 +88,93 @@ $3
 $(separa $1 $2)
 EOF
 }
+
+# Verifica se um texto contém uma ou mais palavras
+# $1 = Texto
+# $2 = Palavra(s)
+texto_contem()
+{
+    if [[ $(echo -e "${1}" | grep -c "${2}") = 0 ]]; then
+        return 1
+    fi
+    return 0
+}
+
+# Substitui um texto por outro no início da string
+# $1 = No início desse texto...
+# $2 = Substituir esse
+# $3 = Por esse
+# Exemplo:
+#   texto="Olá, tudo bem?"
+#   substitui_no_inicio "${texto}" "Olá" "Opa"
+# Saída:
+#   "Opa, tudo bem?"
+substitui_no_inicio()
+{
+    local _tamanho=$(expr length "${2}")
+    
+    # Substitui o texto no início da string
+    [[ "${1:0:${_tamanho}}" = "${2}" ]] && printf %b "${3}${1: ${_tamanho}}"
+}
+
+# Substitui um texto por outro no final da string
+# $1 = No final desse texto...
+# $2 = Substituir esse
+# $3 = Por esse
+# Exemplo:
+#   texto="Opa, tudo bem?"
+#   substitui_no_final "${texto}" "tudo bem?" "Belesma?"
+# Saída:
+#   "Opa, Belesma?"
+
+substitui_no_final()
+{
+    local _tamanho=$(expr length "${2}")
+
+    # Substitui o texto no final da string
+    [[ "${1: -${_tamanho}}" = "${2}" ]] && printf %b "${1::-${_tamanho}}${3}" 
+}
+
+#----------------------------------- ARRAYS ----------------------------------->
+
+# Verifica se o array contém o texto procurado
+# $array() deve ser declarado antes pelo chamador, de forma global
+# $1 = Texto procurado
+# Retorno: 0 = encontrou; 1 = não econtrou
+array_contem()
+{
+    for a in "${array[@]}"; do
+        if [[ "${a}" = "$1" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Salva uma string delimitada em um array()
+# $1 = Delimitador
+# $2 = Texto
+# FONTE: https://unix.stackexchange.com/questions/395742/how-to-convert-a-string-into-array-in-shell-script
+to_array(){
+    
+    # Backup do IFS do shell
+    local bkpIFS="${IFS}"
+    
+    IFS="${1}" read -r -a array <<< "${2}"
+    #printf "%s\n" ${array[@]}
+
+    # Restaura o IFS do shell
+    IFS="${bkpIFS}"
+}
+
+# Salva as linhas de um arquivo em um array() de linhas
+# $1 = Caminho do arquivo
+file_to_array(){
+    array=()
+    while read _linha
+    do
+        array+=("${_linha}")
+    done < $1
+}
 #--------------------------------- FIM-FUNÇÕES --------------------------------<
+
