@@ -1,5 +1,5 @@
 # Install Oracle JDK 8 on Linux
-## Instalação automáGica do Oracle JDK 8 no Linux/Ubuntu 19.10
+## Instalação automáGica do Oracle JDK 8 no Linux/Ubuntu 
 
 
 ```
