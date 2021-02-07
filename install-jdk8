@@ -59,7 +59,7 @@ autor='Vovolinux'
 programa='install-jdk8'
 
 # Versão
-versao='1.0.3'
+versao='1.0.4'
 
 # Ano atual
 ano=$(date "+%Y")
