@@ -6,7 +6,7 @@
 # HOMEPAGE          : https://vovolinux.com.br 
 # DATA DE CRIAÇÃO   : 15/12/2019 às 21:07 
 # PROGRAMA          : install-jdk8
-# VERSÃO            : 1.0.3
+# VERSÃO            : 1.0.4
 # LICENÇA           : MIT - © 2020 - Vovolinux
 # PEQUENA DESCRIÇÃO : Instalação do Java SE Development Kit 8 para GNU/Linux
 # 
@@ -14,6 +14,10 @@
 #        <https://www.javahelps.com/2015/03/install-oracle-jdk-in-ubuntu.html>
 # 
 # CHANGELOG :
+# 2021-02-27 - v1.0.4 - Vovolinux:
+#   - Variável _vjdk passada para o escopo global do script;
+#   - Removida a opção de download pelo script.
+#
 # 2020-05-01 - v1.0.3 - Vovolinux:
 #   - Removida a variável data_arquivo;
 #   - Removida a variável data_log;
@@ -88,7 +92,11 @@ distros=(
     'Ubuntu 19.10'
     'Linux Mint 19.3'
     'Linux Mint 19.2'
+    'Linux Mint 20.1'
 )
+
+# Versão do JDK
+_vjdk='271'
 
 ### VARIÁVEIS DO SISTEMA OPERACIONAL ###
 
@@ -200,31 +208,24 @@ somente_root()
 
 # Oferece uma versão para download pelo terminal
 # Step 1:
-# Download the latest JDK(jdk-8u241-linux-x64.tar.gz) from this official site.
+# Download the latest JDK(jdk-8u271-linux-x64.tar.gz) from this official site.
 oferece_download(){
 
-    local _vjdk='251'
     local _arquivo="jdk-8u${_vjdk}-linux-${arquitetura}.tar.gz"
 
     # Se o arquivo já foi baixado, atualiza o arquivo_tar_gz e encerra a função
     if [[ -f ${_arquivo} ]]; then
         arquivo_tar_gz=${_arquivo}
         return 0
-    fi
-
-    local _cookie='Cookie: oraclelicense=accept-securebackup-cookie'
-    local _url='https://download.oracle.com/otn-pub/java/jdk/8u251-b08'
-    local _key='3d5a2bb8f8d4428bbe94aed7ec7ae784'
-
-    printf %b "Este programa pode fazer o download do arquivo '${_arquivo}'\n"
-    pergunta_sn "Deseja fazer o download automaGicamente?"
-
-    if [[ $? -eq 1 ]]; then
-        printf %b "Ouquei...\n\n${instruc_download}"
-        printf %b "$(sessao_texto "${separador}" "${colunas}" "${rodape}")\n"
-        exit 1
     else
-        wget -c --header "${_cookie}" "${_url}/${_key}/${_arquivo}"
+        cat << EOF
+O arquivo '${_arquivo}' precisa estar no mesmo diretório onde foi executado este programa.
+$(printf %b "${instruc_download}")
+
+Em seguida execute este programa novamente.
+$(sessao_texto "${separador}" "${colunas}" "${rodape}")
+EOF
+        exit 1
     fi
 }
 
